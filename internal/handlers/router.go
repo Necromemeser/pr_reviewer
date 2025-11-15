@@ -13,7 +13,7 @@ func NewRouter(db *storage.Storage) *http.ServeMux {
 	})
 
 	// Team
-	// mux.HandleFunc("POST /team/add", CreateTeamHandler(db))
+	mux.HandleFunc("POST /team/add", CreateTeamHandler(db))
 	mux.HandleFunc("GET /team/get", GetTeamHandler(db))
 
 	// PullRequest
