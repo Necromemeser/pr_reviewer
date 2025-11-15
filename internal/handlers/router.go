@@ -17,9 +17,9 @@ func NewRouter(db *storage.Storage) *http.ServeMux {
 	mux.HandleFunc("GET /team/get", GetTeamHandler(db))
 
 	// PullRequest
-	// mux.HandleFunc("POST /pullRequest/create", CreatePullRequestHandler(db))
-	// mux.HandleFunc("POST /pullRequest/merge", MergePRHandler(db))
-	// mux.HandleFunc("POST /pullRequest/reassign", ReassignReviewerHandler(db))
+	mux.HandleFunc("POST /pullRequest/create", CreatePullRequestHandler(db))
+	mux.HandleFunc("POST /pullRequest/merge", MergePRHandler(db))
+	mux.HandleFunc("POST /pullRequest/reassign", ReassignReviewerHandler(db))
 
 	// Users
 	mux.HandleFunc("GET /users/getReview", GetUserPRsHandler(db))

@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -19,23 +20,19 @@ func ConnectAndMigrate() (*sql.DB, error) {
 		return nil, fmt.Errorf("open db: %w", err)
 	}
 
-	if err = db.Ping(); err != nil {
-		return nil, fmt.Errorf("ping db: %w", err)
+	var pingErr error
+	for i := 0; i < 30; i++ {
+		pingErr = db.Ping()
+		if pingErr == nil {
+			break
+		}
+		time.Sleep(time.Second)
+	}
+	if pingErr != nil {
+		return nil, fmt.Errorf("ping db: %w", pingErr)
 	}
 
 	log.Println("Connected to database")
-
-	// sqlBytes, err := os.ReadFile("migrations/001_init.sql")
-	// if err != nil {
-	// 	return nil, fmt.Errorf("read migration file: %w", err)
-	// }
-
-	// _, err = db.Exec(string(sqlBytes))
-	// if err != nil {
-	// 	return nil, fmt.Errorf("apply migration: %w", err)
-	// }
-
-	// log.Println("Migration applied")
 
 	dir := "migrations"
 
