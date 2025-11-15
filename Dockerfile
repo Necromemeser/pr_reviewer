@@ -1,0 +1,11 @@
+FROM golang:1.24.5
+
+WORKDIR /app
+
+COPY . .
+
+RUN go mod tidy && go build -o app ./cmd/app
+
+EXPOSE 8080
+
+CMD ["./app"]
