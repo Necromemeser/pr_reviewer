@@ -1,16 +1,14 @@
 package storage
 
 import (
-	"errors"
-	// "fmt"
 	"database/sql"
+	"errors"
 	"pr_reviewer/internal/models"
 )
 
 var ErrUserNotFound = errors.New("user not found")
 
 func (s *Storage) GetPR(userID string) ([]models.PullRequestShort, error) {
-	// Получаем все pull_request_id, где пользователь ревьювер
 	rows, err := s.DB.Query(`
         SELECT pr.pull_request_id, pr.pull_request_name, pr.author_id, pr.status
         FROM pull_requests pr
@@ -36,7 +34,6 @@ func (s *Storage) GetPR(userID string) ([]models.PullRequestShort, error) {
 }
 
 func (s *Storage) SetIsActive(userID string, isActive bool) (*models.User, error) {
-	// Проверяем, что пользователь существует
 	var name string
 	err := s.DB.QueryRow(`SELECT username FROM users WHERE user_id = $1`, userID).Scan(&name)
 	if err == sql.ErrNoRows {

@@ -9,7 +9,6 @@ import (
 var ErrTeamNotFound = errors.New("team not found")
 
 func (s *Storage) GetTeam(teamName string) (*models.Team, error) {
-	// Проверяем, что команда существует
 	var name string
 	err := s.DB.QueryRow(`SELECT team_name FROM teams WHERE team_name = $1`, teamName).Scan(&name)
 	if err == sql.ErrNoRows {
@@ -19,9 +18,8 @@ func (s *Storage) GetTeam(teamName string) (*models.Team, error) {
 		return nil, err
 	}
 
-	// Достаём всех участников команды
 	rows, err := s.DB.Query(`
-        SELECT user_id, username, team_name, is_active
+        SELECT user_id, username, is_active
         FROM users
         WHERE team_name = $1`,
 		teamName)
@@ -30,10 +28,10 @@ func (s *Storage) GetTeam(teamName string) (*models.Team, error) {
 	}
 	defer rows.Close()
 
-	members := []models.User{}
+	members := []models.TeamMember{}
 	for rows.Next() {
-		var u models.User
-		err := rows.Scan(&u.UserID, &u.Username, &u.TeamName, &u.IsActive)
+		var u models.TeamMember
+		err := rows.Scan(&u.UserID, &u.Username, &u.IsActive)
 		if err != nil {
 			return nil, err
 		}

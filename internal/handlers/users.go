@@ -13,29 +13,29 @@ func SetIsActiveHandler(db *storage.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.URL.Query().Get("user_id")
 		if userID == "" {
-			http.Error(w, "user_id required", http.StatusBadRequest)
+			WriteError(w, http.StatusBadRequest, "NOT_FOUND", "user_id required")
 			return
 		}
 
 		isActive := r.URL.Query().Get("is_active")
 		if isActive == "" {
-			http.Error(w, "new status required", http.StatusBadRequest)
+			WriteError(w, http.StatusBadRequest, "NOT_FOUND", "new status required")
 			return
 		}
 
 		isActiveBool, err := strconv.ParseBool(isActive)
 		if err != nil {
-			http.Error(w, "invalid is_active value", http.StatusBadRequest)
+			WriteError(w, http.StatusBadRequest, "NOT_FOUND", "invalid is_active value")
 			return
 		}
 
 		updatedUser, err := db.SetIsActive(userID, isActiveBool)
 		if err != nil {
 			if errors.Is(err, storage.ErrUserNotFound) {
-				http.Error(w, err.Error(), http.StatusNotFound)
+				WriteError(w, http.StatusNotFound, "NOT_FOUND", "user not found")
 				return
 			}
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			WriteError(w, http.StatusInternalServerError, "NOT_FOUND", "internal server error")
 			return
 		}
 
@@ -51,13 +51,13 @@ func GetUserPRsHandler(db *storage.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.URL.Query().Get("user_id")
 		if userID == "" {
-			http.Error(w, "user_id required", http.StatusBadRequest)
+			WriteError(w, http.StatusBadRequest, "NOT_FOUND", "user_id required")
 			return
 		}
 
 		prs, err := db.GetPR(userID)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusNotFound)
+			WriteError(w, http.StatusNotFound, "NOT_FOUND", "user not found")
 			return
 		}
 

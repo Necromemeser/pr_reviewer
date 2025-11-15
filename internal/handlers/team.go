@@ -16,13 +16,18 @@ func GetTeamHandler(db *storage.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		teamName := r.URL.Query().Get("team_name")
 		if teamName == "" {
-			http.Error(w, "team_name required", http.StatusBadRequest)
+			WriteError(w, http.StatusBadRequest, "NOT_FOUND", "team_name required")
 			return
 		}
 
 		team, err := db.GetTeam(teamName)
+		if err == storage.ErrTeamNotFound {
+			WriteError(w, http.StatusNotFound, "NOT_FOUND", "team not found")
+			return
+		}
+
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusNotFound)
+			WriteError(w, http.StatusInternalServerError, "NOT_FOUND", "unexpected error")
 			return
 		}
 
