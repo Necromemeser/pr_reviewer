@@ -145,13 +145,13 @@ func TestDeactivateTeamHandler(t *testing.T) {
 		return rec
 	}
 
-	// team_name missing → 400 BAD_REQUEST
+	// team_name missing 400 BAD_REQUEST
 	rec := doReq("/team/deactivate")
 	if rec.Code != http.StatusBadRequest {
 		t.Errorf("expected 400, got %d", rec.Code)
 	}
 
-	// team not found → 404 NOT_FOUND
+	// team not found 404 NOT_FOUND
 	mockTeamStorage.EXPECT().GetTeam("backend").Return(nil, storage.ErrTeamNotFound)
 
 	rec = doReq("/team/deactivate?team_name=backend")
@@ -159,7 +159,7 @@ func TestDeactivateTeamHandler(t *testing.T) {
 		t.Errorf("expected 404, got %d", rec.Code)
 	}
 
-	// unexpected GetTeam error → 500 SERVER_ERROR
+	// unexpected GetTeam error 500 SERVER_ERROR
 	mockTeamStorage.EXPECT().GetTeam("backend").Return(nil, errors.New("db error"))
 
 	rec = doReq("/team/deactivate?team_name=backend")
@@ -167,7 +167,7 @@ func TestDeactivateTeamHandler(t *testing.T) {
 		t.Errorf("expected 500, got %d", rec.Code)
 	}
 
-	// DeactivateTeam error → 500 SERVER_ERROR
+	// DeactivateTeam error 500 SERVER_ERROR
 	team := &models.Team{TeamName: "backend"}
 
 	mockTeamStorage.EXPECT().GetTeam("backend").Return(team, nil)
@@ -178,7 +178,7 @@ func TestDeactivateTeamHandler(t *testing.T) {
 		t.Errorf("expected 500, got %d", rec.Code)
 	}
 
-	// 5. SUCCESS → 200 OK
+	// 5. SUCCESS 200 OK
 	deactivated := &models.Team{TeamName: "backend"}
 
 	mockTeamStorage.EXPECT().GetTeam("backend").Return(team, nil)
