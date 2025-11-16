@@ -101,7 +101,7 @@ func ReassignReviewerHandler(db storage.PRStorage) http.HandlerFunc {
 		}
 
 		if reviewer.ReviewerID == "" {
-			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "author_id is required")
+			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "old_user_id is required")
 			return
 		}
 

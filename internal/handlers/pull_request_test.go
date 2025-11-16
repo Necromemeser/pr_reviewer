@@ -116,7 +116,7 @@ func TestReassignReviewerHandler_Success(t *testing.T) {
 
 	body, _ := json.Marshal(map[string]string{
 		"pull_request_id": prID,
-		"reviewer_id":     oldReviewer,
+		"old_user_id":     oldReviewer,
 	})
 	req := httptest.NewRequest(http.MethodPost, "/pr/reassign", bytes.NewReader(body))
 	w := httptest.NewRecorder()
