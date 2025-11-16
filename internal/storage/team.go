@@ -9,6 +9,7 @@ import (
 type TeamStorage interface {
 	AddTeam(team models.Team) (*models.Team, error)
 	GetTeam(teamName string) (*models.Team, error)
+	DeactivateTeam(team models.Team) (*models.Team, error)
 }
 
 var ErrTeamNotFound = errors.New("team not found")
@@ -109,4 +110,25 @@ func (s *Storage) AddTeam(team models.Team) (*models.Team, error) {
 		TeamName: team.TeamName,
 		Members:  members,
 	}, nil
+}
+
+func (s *Storage) DeactivateTeam(team models.Team) (*models.Team, error) {
+	_, err := s.DB.Exec(
+		`UPDATE users SET is_active = false WHERE team_name = $1`,
+		team.TeamName,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	updated, err := s.GetTeam(team.TeamName)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, ErrTeamNotFound
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return updated, nil
 }

@@ -13,17 +13,17 @@ func CreateTeamHandler(db storage.TeamStorage) http.HandlerFunc {
 
 		var team models.Team
 		if err := json.NewDecoder(r.Body).Decode(&team); err != nil {
-			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "invalid request body")
+			WriteError(w, http.StatusBadRequest, models.BAD_REQUEST, "invalid request body")
 			return
 		}
 
 		newTeam, err := db.AddTeam(team)
 		if err == storage.ErrTeamExists {
-			WriteError(w, http.StatusBadRequest, "TEAM_EXISTS", "team already exists")
+			WriteError(w, http.StatusBadRequest, models.TEAM_EXISTS, "team already exists")
 			return
 		}
 		if err != nil {
-			WriteError(w, http.StatusInternalServerError, "SERVER_ERROR", "unexpected error")
+			WriteError(w, http.StatusInternalServerError, models.SERVER_ERROR, "unexpected error")
 			return
 		}
 
@@ -39,22 +39,52 @@ func GetTeamHandler(db storage.TeamStorage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		teamName := r.URL.Query().Get("team_name")
 		if teamName == "" {
-			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "team_name required")
+			WriteError(w, http.StatusBadRequest, models.BAD_REQUEST, "team_name required")
 			return
 		}
 
 		team, err := db.GetTeam(teamName)
 		if err == storage.ErrTeamNotFound {
-			WriteError(w, http.StatusNotFound, "NOT_FOUND", "team not found")
+			WriteError(w, http.StatusNotFound, models.NOT_FOUND, "team not found")
 			return
 		}
 
 		if err != nil {
-			WriteError(w, http.StatusInternalServerError, "SERVER_ERROR", "unexpected error")
+			WriteError(w, http.StatusInternalServerError, models.SERVER_ERROR, "unexpected error")
 			return
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(team)
+	}
+}
+
+func DeactivateTeamHandler(db storage.TeamStorage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		teamName := r.URL.Query().Get("team_name")
+		if teamName == "" {
+			WriteError(w, http.StatusBadRequest, models.BAD_REQUEST, "team_name required")
+			return
+		}
+
+		team, err := db.GetTeam(teamName)
+		if err == storage.ErrTeamNotFound {
+			WriteError(w, http.StatusNotFound, models.NOT_FOUND, "team not found")
+			return
+		}
+
+		if err != nil {
+			WriteError(w, http.StatusInternalServerError, models.SERVER_ERROR, "failed to get team")
+			return
+		}
+
+		updatedTeam, err := db.DeactivateTeam(*team)
+		if err != nil {
+			WriteError(w, http.StatusInternalServerError, models.SERVER_ERROR, "failed to deactivate team")
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(updatedTeam)
 	}
 }

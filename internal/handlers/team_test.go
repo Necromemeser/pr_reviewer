@@ -3,6 +3,7 @@ package handlers_test
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -127,5 +128,64 @@ func TestGetTeamHandler_NotFound(t *testing.T) {
 
 	if w.Code != http.StatusNotFound {
 		t.Fatalf("expected 404, got %d", w.Code)
+	}
+}
+
+func TestDeactivateTeamHandler(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockTeamStorage := mocks.NewMockTeamStorage(ctrl)
+	handler := handlers.DeactivateTeamHandler(mockTeamStorage)
+
+	doReq := func(url string) *httptest.ResponseRecorder {
+		req := httptest.NewRequest(http.MethodPost, url, nil)
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+		return rec
+	}
+
+	// team_name missing → 400 BAD_REQUEST
+	rec := doReq("/team/deactivate")
+	if rec.Code != http.StatusBadRequest {
+		t.Errorf("expected 400, got %d", rec.Code)
+	}
+
+	// team not found → 404 NOT_FOUND
+	mockTeamStorage.EXPECT().GetTeam("backend").Return(nil, storage.ErrTeamNotFound)
+
+	rec = doReq("/team/deactivate?team_name=backend")
+	if rec.Code != http.StatusNotFound {
+		t.Errorf("expected 404, got %d", rec.Code)
+	}
+
+	// unexpected GetTeam error → 500 SERVER_ERROR
+	mockTeamStorage.EXPECT().GetTeam("backend").Return(nil, errors.New("db error"))
+
+	rec = doReq("/team/deactivate?team_name=backend")
+	if rec.Code != http.StatusInternalServerError {
+		t.Errorf("expected 500, got %d", rec.Code)
+	}
+
+	// DeactivateTeam error → 500 SERVER_ERROR
+	team := &models.Team{TeamName: "backend"}
+
+	mockTeamStorage.EXPECT().GetTeam("backend").Return(team, nil)
+	mockTeamStorage.EXPECT().DeactivateTeam(*team).Return(nil, errors.New("update error"))
+
+	rec = doReq("/team/deactivate?team_name=backend")
+	if rec.Code != http.StatusInternalServerError {
+		t.Errorf("expected 500, got %d", rec.Code)
+	}
+
+	// 5. SUCCESS → 200 OK
+	deactivated := &models.Team{TeamName: "backend"}
+
+	mockTeamStorage.EXPECT().GetTeam("backend").Return(team, nil)
+	mockTeamStorage.EXPECT().DeactivateTeam(*team).Return(deactivated, nil)
+
+	rec = doReq("/team/deactivate?team_name=backend")
+	if rec.Code != http.StatusOK {
+		t.Errorf("expected 200, got %d", rec.Code)
 	}
 }

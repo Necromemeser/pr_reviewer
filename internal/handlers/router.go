@@ -15,6 +15,8 @@ func NewRouter(db *storage.Storage) *http.ServeMux {
 	// Team
 	mux.HandleFunc("POST /team/add", CreateTeamHandler(db))
 	mux.HandleFunc("GET /team/get", GetTeamHandler(db))
+	// Team Deactivation
+	mux.HandleFunc("PATCH /team/deactivate", DeactivateTeamHandler(db))
 
 	// PullRequest
 	mux.HandleFunc("POST /pullRequest/create", CreatePullRequestHandler(db))

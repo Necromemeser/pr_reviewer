@@ -13,30 +13,34 @@ func CreatePullRequestHandler(db storage.PRStorage) http.HandlerFunc {
 
 		var pr models.PullRequest
 		if err := json.NewDecoder(r.Body).Decode(&pr); err != nil {
-			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "invalid request body")
+			WriteError(w, http.StatusBadRequest, models.BAD_REQUEST, "invalid request body")
 			return
 		}
 
 		if pr.AuthorID == nil || *pr.AuthorID == "" {
-			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "author_id is required")
+			WriteError(w, http.StatusBadRequest, models.BAD_REQUEST, "author_id is required")
 			return
 		}
 		if pr.PullRequestID == "" {
-			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "pull_request_id is required")
+			WriteError(w, http.StatusBadRequest, models.BAD_REQUEST, "pull_request_id is required")
 			return
 		}
 		if pr.PullRequestName == "" {
-			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "pull_request_name is required")
+			WriteError(w, http.StatusBadRequest, models.BAD_REQUEST, "pull_request_name is required")
 			return
 		}
 
 		newPR, err := db.CreatePullRequest(pr.PullRequestID, pr.PullRequestName, *pr.AuthorID)
 		if err == storage.ErrPRExists {
-			WriteError(w, http.StatusConflict, "PR_EXISTS", "PR id already exists")
+			WriteError(w, http.StatusConflict, models.PR_EXISTS, "PR id already exists")
+			return
+		}
+		if err == storage.ErrAuthorNotFound {
+			WriteError(w, http.StatusNotFound, models.NOT_FOUND, "PR author does not exist or is not an active user")
 			return
 		}
 		if err != nil {
-			WriteError(w, http.StatusInternalServerError, "SERVER_ERROR", "unexpected error")
+			WriteError(w, http.StatusInternalServerError, models.SERVER_ERROR, "unexpected error")
 			return
 		}
 
@@ -54,22 +58,22 @@ func MergePRHandler(db storage.PRStorage) http.HandlerFunc {
 
 		var pr models.PullRequest
 		if err := json.NewDecoder(r.Body).Decode(&pr); err != nil {
-			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "invalid request body")
+			WriteError(w, http.StatusBadRequest, models.BAD_REQUEST, "invalid request body")
 			return
 		}
 
 		if pr.PullRequestID == "" {
-			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "pull_request_id is required")
+			WriteError(w, http.StatusBadRequest, models.BAD_REQUEST, "pull_request_id is required")
 			return
 		}
 
 		mergedPR, err := db.MergePullRequest(pr.PullRequestID)
 		if err == storage.ErrPRNotFound {
-			WriteError(w, http.StatusNotFound, "BAD_REQUEST", "PR id not found")
+			WriteError(w, http.StatusNotFound, models.NOT_FOUND, "PR id not found")
 			return
 		}
 		if err != nil {
-			WriteError(w, http.StatusInternalServerError, "SERVER_ERROR", "unexpected error")
+			WriteError(w, http.StatusInternalServerError, models.SERVER_ERROR, "unexpected error")
 			return
 		}
 

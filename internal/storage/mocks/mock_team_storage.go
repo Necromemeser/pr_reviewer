@@ -49,6 +49,21 @@ func (mr *MockTeamStorageMockRecorder) AddTeam(team interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddTeam", reflect.TypeOf((*MockTeamStorage)(nil).AddTeam), team)
 }
 
+// DeactivateTeam mocks base method.
+func (m *MockTeamStorage) DeactivateTeam(team models.Team) (*models.Team, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeactivateTeam", team)
+	ret0, _ := ret[0].(*models.Team)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeactivateTeam indicates an expected call of DeactivateTeam.
+func (mr *MockTeamStorageMockRecorder) DeactivateTeam(team interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeactivateTeam", reflect.TypeOf((*MockTeamStorage)(nil).DeactivateTeam), team)
+}
+
 // GetTeam mocks base method.
 func (m *MockTeamStorage) GetTeam(teamName string) (*models.Team, error) {
 	m.ctrl.T.Helper()

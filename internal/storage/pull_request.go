@@ -19,11 +19,27 @@ var ErrReviewerNotFound = errors.New("reviewer id not found")
 var ErrPRMerged = errors.New("PR is merged")
 var ErrNoCandidate = errors.New("no active replacement candidate in team")
 var ErrNotAssigned = errors.New("reviewer is not assigned to this PR")
+var ErrAuthorNotFound = errors.New("PR author does not exist or is not an active user")
 
 func (s *Storage) CreatePullRequest(pullRequestID, pullRequestName, authorID string) (*models.PullRequest, error) {
+	// Проверяем, существует ли автор и активен ли он
+	var active string
+	err := s.DB.QueryRow(`
+        SELECT user_id 
+        FROM users 
+        WHERE user_id = $1 AND is_active = true
+    `, authorID).Scan(&active)
+
+	if err != nil && err != sql.ErrNoRows {
+		return nil, err
+	}
+	if active == "" {
+		return nil, ErrAuthorNotFound
+	}
+
 	// Проверяем, нет ли уже PR с таким ID
 	var existing string
-	err := s.DB.QueryRow(`
+	err = s.DB.QueryRow(`
         SELECT pull_request_id 
         FROM pull_requests 
         WHERE pull_request_id = $1
