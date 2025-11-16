@@ -9,6 +9,8 @@ const (
 	NOT_ASSIGNED ErrorCode = "NOT_ASSIGNED"
 	NO_CANDIDATE ErrorCode = "NO_CANDIDATE"
 	NOT_FOUND    ErrorCode = "NOT_FOUND"
+	BAD_REQUEST  ErrorCode = "BAD_REQUEST"
+	SERVER_ERROR ErrorCode = "SERVER_ERROR"
 )
 
 type ErrorResponse struct {

@@ -13,20 +13,20 @@ func CreatePullRequestHandler(db storage.PRStorage) http.HandlerFunc {
 
 		var pr models.PullRequest
 		if err := json.NewDecoder(r.Body).Decode(&pr); err != nil {
-			WriteError(w, http.StatusBadRequest, "NOT_FOUND", "invalid request body")
+			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "invalid request body")
 			return
 		}
 
 		if pr.AuthorID == nil || *pr.AuthorID == "" {
-			WriteError(w, http.StatusBadRequest, "NOT_FOUND", "author_id is required")
+			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "author_id is required")
 			return
 		}
 		if pr.PullRequestID == "" {
-			WriteError(w, http.StatusBadRequest, "NOT_FOUND", "pull_request_id is required")
+			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "pull_request_id is required")
 			return
 		}
 		if pr.PullRequestName == "" {
-			WriteError(w, http.StatusBadRequest, "NOT_FOUND", "pull_request_name is required")
+			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "pull_request_name is required")
 			return
 		}
 
@@ -36,7 +36,7 @@ func CreatePullRequestHandler(db storage.PRStorage) http.HandlerFunc {
 			return
 		}
 		if err != nil {
-			WriteError(w, http.StatusInternalServerError, "NOT_FOUND", "unexpected error")
+			WriteError(w, http.StatusInternalServerError, "SERVER_ERROR", "unexpected error")
 			return
 		}
 
@@ -54,22 +54,22 @@ func MergePRHandler(db storage.PRStorage) http.HandlerFunc {
 
 		var pr models.PullRequest
 		if err := json.NewDecoder(r.Body).Decode(&pr); err != nil {
-			WriteError(w, http.StatusBadRequest, "NOT_FOUND", "invalid request body")
+			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "invalid request body")
 			return
 		}
 
 		if pr.PullRequestID == "" {
-			WriteError(w, http.StatusBadRequest, "NOT_FOUND", "pull_request_id is required")
+			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "pull_request_id is required")
 			return
 		}
 
 		mergedPR, err := db.MergePullRequest(pr.PullRequestID)
 		if err == storage.ErrPRNotFound {
-			WriteError(w, http.StatusNotFound, "NOT FOUND", "PR id not found")
+			WriteError(w, http.StatusNotFound, "BAD_REQUEST", "PR id not found")
 			return
 		}
 		if err != nil {
-			WriteError(w, http.StatusInternalServerError, "NOT_FOUND", "unexpected error")
+			WriteError(w, http.StatusInternalServerError, "SERVER_ERROR", "unexpected error")
 			return
 		}
 
@@ -87,27 +87,27 @@ func ReassignReviewerHandler(db storage.PRStorage) http.HandlerFunc {
 
 		var reviewer models.Reviewer
 		if err := json.NewDecoder(r.Body).Decode(&reviewer); err != nil {
-			WriteError(w, http.StatusBadRequest, "NOT_FOUND", "invalid request body")
+			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "invalid request body")
 			return
 		}
 
 		if reviewer.PullRequestID == "" {
-			WriteError(w, http.StatusBadRequest, "NOT_FOUND", "pull_request_id is required")
+			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "pull_request_id is required")
 			return
 		}
 
 		if reviewer.ReviewerID == "" {
-			WriteError(w, http.StatusBadRequest, "NOT_FOUND", "author_id is required")
+			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "author_id is required")
 			return
 		}
 
 		newPR, newReviewer, err := db.ReasignReviewer(reviewer.PullRequestID, reviewer.ReviewerID)
 		if err == storage.ErrPRNotFound {
-			WriteError(w, http.StatusNotFound, "NOT FOUND", "PR id not found")
+			WriteError(w, http.StatusNotFound, "NOT_FOUND", "PR id not found")
 			return
 		}
 		if err == storage.ErrReviewerNotFound {
-			WriteError(w, http.StatusNotFound, "NOT FOUND", "reviewer id not found")
+			WriteError(w, http.StatusNotFound, "NOT_FOUND", "reviewer id not found")
 			return
 		}
 		if err == storage.ErrNoCandidate {
@@ -123,7 +123,7 @@ func ReassignReviewerHandler(db storage.PRStorage) http.HandlerFunc {
 			return
 		}
 		if err != nil {
-			WriteError(w, http.StatusInternalServerError, "NOT_FOUND", "internal server error")
+			WriteError(w, http.StatusInternalServerError, "SERVER_ERROR", "internal server error")
 			return
 		}
 

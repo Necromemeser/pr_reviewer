@@ -13,7 +13,7 @@ func CreateTeamHandler(db storage.TeamStorage) http.HandlerFunc {
 
 		var team models.Team
 		if err := json.NewDecoder(r.Body).Decode(&team); err != nil {
-			WriteError(w, http.StatusBadRequest, "NOT_FOUND", "invalid request body")
+			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "invalid request body")
 			return
 		}
 
@@ -23,7 +23,7 @@ func CreateTeamHandler(db storage.TeamStorage) http.HandlerFunc {
 			return
 		}
 		if err != nil {
-			WriteError(w, http.StatusInternalServerError, "NOT_FOUND", "unexpected error")
+			WriteError(w, http.StatusInternalServerError, "SERVER_ERROR", "unexpected error")
 			return
 		}
 
@@ -39,7 +39,7 @@ func GetTeamHandler(db storage.TeamStorage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		teamName := r.URL.Query().Get("team_name")
 		if teamName == "" {
-			WriteError(w, http.StatusBadRequest, "NOT_FOUND", "team_name required")
+			WriteError(w, http.StatusBadRequest, "BAD_REQUEST", "team_name required")
 			return
 		}
 
@@ -50,7 +50,7 @@ func GetTeamHandler(db storage.TeamStorage) http.HandlerFunc {
 		}
 
 		if err != nil {
-			WriteError(w, http.StatusInternalServerError, "NOT_FOUND", "unexpected error")
+			WriteError(w, http.StatusInternalServerError, "SERVER_ERROR", "unexpected error")
 			return
 		}
 
