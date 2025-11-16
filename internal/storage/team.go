@@ -6,6 +6,11 @@ import (
 	"pr_reviewer/internal/models"
 )
 
+type TeamStorage interface {
+	AddTeam(team models.Team) (*models.Team, error)
+	GetTeam(teamName string) (*models.Team, error)
+}
+
 var ErrTeamNotFound = errors.New("team not found")
 var ErrTeamExists = errors.New("team already exists")
 

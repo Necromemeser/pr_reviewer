@@ -6,6 +6,11 @@ import (
 	"pr_reviewer/internal/models"
 )
 
+type UserStorage interface {
+	GetPR(userID string) ([]models.PullRequestShort, error)
+	SetIsActive(userID string, isActive bool) (*models.User, error)
+}
+
 var ErrUserNotFound = errors.New("user not found")
 
 func (s *Storage) GetPR(userID string) ([]models.PullRequestShort, error) {

@@ -7,7 +7,7 @@ import (
 	"pr_reviewer/internal/storage"
 )
 
-func CreatePullRequestHandler(db *storage.Storage) http.HandlerFunc {
+func CreatePullRequestHandler(db storage.PRStorage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
@@ -48,7 +48,7 @@ func CreatePullRequestHandler(db *storage.Storage) http.HandlerFunc {
 	}
 }
 
-func MergePRHandler(db *storage.Storage) http.HandlerFunc {
+func MergePRHandler(db storage.PRStorage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
@@ -81,7 +81,7 @@ func MergePRHandler(db *storage.Storage) http.HandlerFunc {
 	}
 }
 
-func ReassignReviewerHandler(db *storage.Storage) http.HandlerFunc {
+func ReassignReviewerHandler(db storage.PRStorage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 

@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func SetIsActiveHandler(db *storage.Storage) http.HandlerFunc {
+func SetIsActiveHandler(db storage.UserStorage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.URL.Query().Get("user_id")
 		if userID == "" {
@@ -47,7 +47,7 @@ func SetIsActiveHandler(db *storage.Storage) http.HandlerFunc {
 	}
 }
 
-func GetUserPRsHandler(db *storage.Storage) http.HandlerFunc {
+func GetUserPRsHandler(db storage.UserStorage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.URL.Query().Get("user_id")
 		if userID == "" {

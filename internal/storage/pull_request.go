@@ -7,6 +7,12 @@ import (
 	"time"
 )
 
+type PRStorage interface {
+	CreatePullRequest(pullRequestID, pullRequestName, authorID string) (*models.PullRequest, error)
+	MergePullRequest(pullRequestID string) (*models.PullRequest, error)
+	ReasignReviewer(pullRequestID, oldReviewerID string) (*models.PullRequest, string, error)
+}
+
 var ErrPRExists = errors.New("PR id already exists")
 var ErrPRNotFound = errors.New("PR id not found")
 var ErrReviewerNotFound = errors.New("reviewer id not found")

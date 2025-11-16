@@ -7,7 +7,7 @@ import (
 	"pr_reviewer/internal/storage"
 )
 
-func CreateTeamHandler(db *storage.Storage) http.HandlerFunc {
+func CreateTeamHandler(db storage.TeamStorage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
@@ -35,7 +35,7 @@ func CreateTeamHandler(db *storage.Storage) http.HandlerFunc {
 	}
 }
 
-func GetTeamHandler(db *storage.Storage) http.HandlerFunc {
+func GetTeamHandler(db storage.TeamStorage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		teamName := r.URL.Query().Get("team_name")
 		if teamName == "" {
