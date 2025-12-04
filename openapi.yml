@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: PR Reviewer Assignment Service (Test Task, Fall 2025)
+  title: PR Reviewer Assignment Service
   version: "1.0.0"
 
 tags:
